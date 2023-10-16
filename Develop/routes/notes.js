@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const fs = require("fs");
 const { v4: uuidv4 } = require('uuid');
-const { readAndAppend, readFromFile } = require('./public/helpers');
+const { readAndAppend, readFromFile } = require('../public/helpers');
 
 router.get("/notes", (req, res) => (
     readFromFile("./db/db.json")).then((data) => res.json(JSON.parse(data)))
@@ -28,6 +28,9 @@ router.post("/notes", (req, res) => {
 
 router.delete("/note/:id", (req, res) => {
     fs.readFile("db/db.json", "utf8", (err, data) => {
+        if(err){
+            res.json(`Error deleting note: ${err}`)
+        }
         const noteList = JSON.parse(data);
         const updatedNoteList = noteList.filter( (note) => {return note.id != req.params.id});
         fs.writeFile("db/db.json", JSON.stringify(updatedNoteList, null, 4), (err) => {
